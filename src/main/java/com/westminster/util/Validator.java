@@ -1,6 +1,8 @@
 package com.westminster.util;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.westminster.dao.ProductDao;
+import com.westminster.model.Product;
 import com.westminster.view.UserView;
 
 import java.util.Scanner;
@@ -78,5 +80,19 @@ public abstract class Validator {
             throw new java.lang.IllegalArgumentException("Invalid hash provided for comparison");
         return BCrypt.verifyer().verify(password_plaintext.toCharArray(), stored_hash).verified;
 
+    }
+
+    /**
+     * validates a new product
+     * @param product product
+     * @return booelan
+     * @throws Exception exception
+     */
+    public static boolean validateNewProduct(Product product) throws Exception {
+        return !ProductDao.isFull() && !ProductDao.doesExist(product);
+    }
+
+    public static boolean validateProduct(Product product) throws Exception {
+        return ProductDao.doesExist(product);
     }
 }

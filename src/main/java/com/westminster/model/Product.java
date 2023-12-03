@@ -6,6 +6,7 @@ public abstract class Product {
     private String productName; //name of the product
     private int availableItems; //number of available items
     private double price; //price of the product
+    productType type; //type of the product
 
     // default constructor
     public Product() {
@@ -43,7 +44,16 @@ public abstract class Product {
     public void setPrice(double price) {
         this.price = price;
     }
-//toString method
+
+    public productType getType() {
+        return type;
+    }
+
+    public void setType(productType type) {
+        this.type = type;
+    }
+
+    //toString method
     @Override
     public String toString() {
         return "Product{" +

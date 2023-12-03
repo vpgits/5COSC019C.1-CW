@@ -4,15 +4,15 @@ import com.westminster.model.Product;
 
 import java.util.ArrayList;
 
-interface ShoppingManager {
+public interface ShoppingManager {
 
-    void addProduct(Product product);
+    void addProduct(Product product) throws Exception;
 
-    void removeProduct(Product product);
+    void removeProduct (Product product) throws Exception;
 
-    void updateProduct(Product product);
+    void updateProduct(Product product) throws Exception;
 
-    void checkAvailability(Product product);
+    void checkAvailability(Product product) throws Exception;
 
     void buyProduct(Product product);
 
