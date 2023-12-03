@@ -1,6 +1,8 @@
 package com.westminster.model;
 
-class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     //instance variables
     private String userID; //ID of the user
     private String firstName; //first name of the user
@@ -8,7 +10,7 @@ class User {
     private String address; //address of the user
     private String contactNumber; //contact number of the user
     private String email; //email of the user
-    private String password; //password of the user
+    private String password; //password of the user . A BCrypt hash which is a string
 
     //default constructor
     public User() {
@@ -84,4 +86,8 @@ class User {
                 ", password='" + password + '\'' +
                 '}';
     }
+}
+
+class UserSerializer{
+
 }

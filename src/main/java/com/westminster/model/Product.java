@@ -1,6 +1,6 @@
 package com.westminster.model;
 
-abstract class Product {
+public abstract class Product {
     //instance variables
     private String productID; //ID of the product
     private String productName; //name of the product
