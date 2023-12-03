@@ -28,11 +28,11 @@ class Electronics extends Product{
         this.model = model;
     }
 
-    public String getType() {
+    public String getElectricalProductType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setElectricalProductType(String type) {
         this.type = type;
     }
 
