@@ -1,6 +1,6 @@
 package com.westminster.model;
 
-class Electronics extends Product{
+public class Electronics extends Product{
     //instance variables
     private String brand; //brand of the electronic product
     private String model; //model of the electronic product
@@ -11,6 +11,16 @@ class Electronics extends Product{
     public Electronics() {
         super();
     }
+
+    public Electronics (String productID, String productName, int availableItems, double price, String brand,
+                        String model, String type, int warranty){
+        super(productID, productName, availableItems, price , ProductType.Electronics);
+        this.brand = brand;
+        this.model = model;
+        this.type = type;
+        this.warranty = warranty;
+    }
+
     //getters and setters
     public String getBrand() {
         return brand;

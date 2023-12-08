@@ -1,6 +1,6 @@
 package com.westminster.model;
 
-public enum productType {
+public enum ProductType {
     Clothing,
     Electronics
 }

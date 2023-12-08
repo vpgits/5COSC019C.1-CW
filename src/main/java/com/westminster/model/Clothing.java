@@ -1,15 +1,22 @@
 package com.westminster.model;
 
-class Clothing {
+public class Clothing extends Product {
     //instance variables
     private String brand; //brand of the clothing product
-    private String size; //size of the clothing product(S/M/L/XL)
-    private String type; //type of the clothing product(Male/Female/Adult/Child)
+    private ClothingSize size; //size of the clothing product(S/M/L/XL)
     private String color; //color of the clothing product
 
     //default constructor
     public Clothing() {
         super();
+    }
+
+    public Clothing(String productID, String productName, int availableItems, double price
+            , String brand, ClothingSize size, String color) {
+        super(productID, productName, availableItems, price, ProductType.Clothing);
+        this.brand = brand;
+        this.size = size;
+        this.color = color;
     }
     //getters and setters
 
@@ -21,19 +28,19 @@ class Clothing {
         this.brand = brand;
     }
 
-    public String getSize() {
+    public ClothingSize getSize() {
         return size;
     }
 
-    public void setSize(String size) {
+    public void setSize(ClothingSize size) {
         this.size = size;
     }
 
-    public String getType() {
+    public ProductType getClothingType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setClothingType(ProductType type) {
         this.type = type;
     }
 

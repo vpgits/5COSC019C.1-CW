@@ -6,20 +6,10 @@ import java.util.ArrayList;
 
 public interface ShoppingManager {
 
-    void addProduct(Product product) throws Exception;
+    static void addProduct() throws Exception {}
 
-    void removeProduct (Product product) throws Exception;
+    static void removeProduct () throws Exception{}
 
-    void updateProduct(Product product) throws Exception;
-
-    void checkAvailability(Product product) throws Exception;
-
-    void buyProduct(Product product);
-
-    void viewAllProducts();
-
-    void viewProduct(Product product);
-
-    void saveProducts(ArrayList<Product> products);
+    static void updateProduct() throws Exception {}
 
 }

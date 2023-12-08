@@ -9,36 +9,37 @@ import java.util.ArrayList;
 
 
 public class UserController {
-
+    UserView userView;
 
     public UserController() {
         super();
+        userView = new UserView();
     }
 
 
     public void addUser() throws Exception {
-        String email = Validator.validateEmail();
-        String password = Validator.validatePassword();
+        String email = Validator.validateEmail(userView);
+        String password = Validator.validatePassword(userView);
         if(!UserDao.isFull()){
             UserDao.addUser(email, password);
-            UserView.getInstance().callArgument(UserView.USERCONFIRM);
+            userView.callArgument(UserView.USERCONFIRM);
         } else {
-            UserView.getInstance().printError(UserView.MAXUSER);
+            userView.printError(UserView.MAXUSER);
         }
     }
 
     public void logIn() throws Exception {
-        String email = Validator.validateEmail();
-        String password = Validator.validatePassword();
+        String email = Validator.validateEmail(userView);
+        String password = Validator.validatePassword(userView);
         if (!UserDao.isEmpty()) {
            String passwordHash = UserDao.getUserPasswordHash(email);
            if (Validator.checkPasswordHash(password, passwordHash)) {
-               UserView.getInstance().callArgument(UserView.USERCONFIRM);
+               userView.callArgument(UserView.USERCONFIRM);
            } else {
-               UserView.getInstance().printError(UserView.USERNOTFOUND);
+               userView.printError(UserView.USERNOTFOUND);
            }
         } else {
-            UserView.getInstance().printError(UserView.USERNOTFOUND);
+            userView.printError(UserView.USERNOTFOUND);
         }
     }
 }

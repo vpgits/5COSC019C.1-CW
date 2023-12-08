@@ -8,7 +8,6 @@ import java.util.Scanner;
 public class UserView implements View {
     public static final String USERNOTFOUND = "User not found";
     private final Scanner scanner = new Scanner(System.in);
-    private static UserView instance; //singleton instance
     public static final String EMAILPROMPT = "Enter the user email (username): ";
     public static final String PASSWORDHELPER = "Password should be 8-16 characters long and contain at least one " +
             "uppercase letter, one lowercase letter, one number and one special character";

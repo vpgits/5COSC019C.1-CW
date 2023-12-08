@@ -9,11 +9,13 @@ import com.westminster.view.WestminsterShoppingManagerView;
 import com.westminster.view.UserView;
 
 public abstract class WestminsterShoppingManagerController implements ShoppingManager {
+
+    private static WestminsterShoppingManagerController westminsterShoppingManagerController;
     private static UserController userController;
     private static UserView userView;
     private static ProductController productController;
     private static ProductView productView;
-    public WestminsterShoppingManagerController() {
+    private WestminsterShoppingManagerController() {
         super();
         userController = new UserController();
         userView = new UserView();
@@ -21,49 +23,45 @@ public abstract class WestminsterShoppingManagerController implements ShoppingMa
         productView = new ProductView();
     }
 
-    public static void menu(String input) throws Exception{
+    public static WestminsterShoppingManagerController getInstance(){
+        if (westminsterShoppingManagerController == null){
+            westminsterShoppingManagerController = new WestminsterShoppingManagerController() {
+            };
+        }
+        return westminsterShoppingManagerController;
+    }
+
+    public void menu(String input) throws Exception{
         switch (input) {
             case "1":
-                productController.
+                addProduct();
                 break;
             case "2":
-                userController
+                updateProduct();
                 break;
             case "3":
-                System.exit(0);
+                deleteProduct();
                 break;
             case "4":
                 WestminsterShoppingManagerView.start();
                 break;
             case "5":
                 WestminsterShoppingManagerView.printMessage("Thank you for using the system");
+                System.exit(0);
                 break;
             default:
-                UserView.getInstance().printError("Invalid input");
+                WestminsterShoppingManagerView.printError("Invalid input");
+                System.out.flush();
                 break;
         }
     }
-
-
-    public void addProduct(Product product) throws Exception {
-        if (Validator.validateNewProduct(product)){
-            ProductDao.addProduct(product);
-            WestminsterShoppingManagerView.printMessage("Product added successfully");
-        }
+    public void addProduct() throws Exception {
+        productController.addProduct();
     }
-
-    public void deleteProduct(Product product) throws Exception{
-        if (Validator.validateProduct(product)){
-            ProductDao.deleteProduct(product);
-            WestminsterShoppingManagerView.printMessage("Product deleted successfully");
-        }
+    public void updateProduct() throws Exception {
+        productController.updateProduct();
     }
-
-    public void updateProduct(Product product) throws Exception{
-        if (Validator.validateProduct(product)){
-            ProductDao.updateProduct(product);
-            WestminsterShoppingManagerView.printMessage("Product updated successfully");
-        }
+    public void deleteProduct() throws Exception {
+        productController.deleteProduct();
     }
-
 }
