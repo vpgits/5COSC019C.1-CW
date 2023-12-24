@@ -1,11 +1,23 @@
 package com.westminster.model;
 
-public class Electronics extends Product{
+import java.io.Serializable;
+
+public class Electronics extends Product implements Serializable {
     //instance variables
     private String brand; //brand of the electronic product
     private String model; //model of the electronic product
     private String type; //type of the electronic product
     private int warranty; //warranty of the electronic product in months
+
+    @Override
+    public String toString() {
+        return
+                "brand='" + brand + '\n' +
+                ", model='" + model + '\n' +
+                ", type='" + type + '\n' +
+                ", warranty=" + warranty
+                ;
+    }
 
     //default constructor
     public Electronics() {

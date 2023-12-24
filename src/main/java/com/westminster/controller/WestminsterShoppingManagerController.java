@@ -1,26 +1,16 @@
 package com.westminster.controller;
 
-import com.westminster.dao.ProductDao;
 import com.westminster.interfaces.ShoppingManager;
-import com.westminster.model.Product;
-import com.westminster.util.Validator;
-import com.westminster.view.ProductView;
+import com.westminster.view.GuiView;
 import com.westminster.view.WestminsterShoppingManagerView;
-import com.westminster.view.UserView;
 
 public abstract class WestminsterShoppingManagerController implements ShoppingManager {
 
     private static WestminsterShoppingManagerController westminsterShoppingManagerController;
-    private static UserController userController;
-    private static UserView userView;
     private static ProductController productController;
-    private static ProductView productView;
     private WestminsterShoppingManagerController() {
         super();
-        userController = new UserController();
-        userView = new UserView();
         productController = new ProductController();
-        productView = new ProductView();
     }
 
     public static WestminsterShoppingManagerController getInstance(){
@@ -46,6 +36,9 @@ public abstract class WestminsterShoppingManagerController implements ShoppingMa
                 WestminsterShoppingManagerView.start();
                 break;
             case "5":
+                launchGUI();
+                break;
+            case "6":
                 WestminsterShoppingManagerView.printMessage("Thank you for using the system");
                 System.exit(0);
                 break;
@@ -63,5 +56,8 @@ public abstract class WestminsterShoppingManagerController implements ShoppingMa
     }
     public void deleteProduct() throws Exception {
         productController.deleteProduct();
+    }
+    public void launchGUI() throws Exception {
+        GuiView.start();
     }
 }

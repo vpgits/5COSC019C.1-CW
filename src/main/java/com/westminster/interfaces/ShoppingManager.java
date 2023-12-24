@@ -1,8 +1,5 @@
 package com.westminster.interfaces;
 
-import com.westminster.model.Product;
-
-import java.util.ArrayList;
 
 public interface ShoppingManager {
 

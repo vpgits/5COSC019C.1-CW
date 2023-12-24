@@ -1,6 +1,7 @@
 package com.westminster.app;
 
 
+import com.westminster.controller.UserController;
 import com.westminster.view.WestminsterShoppingManagerView;
 
 
@@ -10,6 +11,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // Press Alt+Enter with your caret at the highlighted text to see how
         // IntelliJ IDEA suggests fixing it.
-        WestminsterShoppingManagerView.start();
+        UserController userController = new UserController();
+        userController.signUp();
     }
 }

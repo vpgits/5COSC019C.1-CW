@@ -2,16 +2,16 @@ package com.westminster.dao;
 
 import com.westminster.model.User;
 import com.westminster.util.SQLiteConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
  * Data Access Object for User
  */
 public class UserDao {
-    private static ArrayList<User> users = new ArrayList<User>(50);
     /**
      * Private constructor to prevent instantiation
      */
@@ -25,21 +25,40 @@ public class UserDao {
      * @param password password
      * @throws UserDaoException User DAO error
      */
-    public static void addUser(String username, String password) throws UserDaoException {
-            users.add(new User());
-            users.getLast().setEmail(username);
-            users.getLast().setPassword(password);
-            String sql = "INSERT INTO user(username, password) VALUES(?,?)";// sample sql string template
-            try (
-                    Connection conn = SQLiteConnection.connect();
-                    PreparedStatement pstmt = conn.prepareStatement(sql)
-            ) {
-                pstmt.setString(1, username);
-                pstmt.setString(2, password);
-                pstmt.executeUpdate();
-            } catch (Exception e) {
-                throw new UserDaoException("Error adding user: " + e.getMessage());
-            }
+    public static void addUser(String username, String password, String fname,String lname, String email) throws UserDaoException{
+        if(getUserCount()>=50){
+            throw new UserDaoException("User limit reached");
+        }
+        String sql = "INSERT INTO user(username, password, name, email) VALUES(?,?,?,?)";
+        try (
+            Connection conn = SQLiteConnection.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.setString(3, fname+" "+lname);
+            pstmt.setString(4, email);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            throw new UserDaoException("Error adding user: " + e.getMessage());
+        }
+    }
+
+
+    public static boolean doesExist(String username) {
+        String sql = "SELECT username FROM user WHERE username = ?";
+        try(
+            Connection conn = SQLiteConnection.connect();
+            PreparedStatement pstmt = conn.prepareStatement(sql)
+        ){
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()&&rs.getString("username").equals(username)){
+                return true;
+            } else return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -48,29 +67,40 @@ public class UserDao {
      * @return password has of the user
      * @throws UserDaoException User DAO error
      */
-    public static String getUserPasswordHash(String username) throws UserDaoException {
+    public static String getUserPasswordHash(String username) {
         String sql = "SELECT password  FROM user WHERE username = ?";
         try(
                 Connection conn = SQLiteConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
                 ) {
             pstmt.setString(1, username);
-            pstmt.executeUpdate();
-            if (pstmt.getResultSet().next()) {
-                return pstmt.getResultSet().getString("password");
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("password");
             } else {
-                throw new UserDoesNotExistException("User does not exist");
+                return null;
             }
         } catch (Exception e) {
-            throw new UserDaoException("Error getting user: " + e.getMessage());
+            System.out.println(e.getMessage());
+            return null;
         }
     }
 
-    public static boolean isFull(){
-        return users.size() >= 50;
-    }
-    public static boolean isEmpty(){
-        return users.isEmpty();
+    public static int getUserCount() {
+        String sql = "SELECT COUNT(*) FROM user";
+        try(
+                Connection conn = SQLiteConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+                ) {
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
 

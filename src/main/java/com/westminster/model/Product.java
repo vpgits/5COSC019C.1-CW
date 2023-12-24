@@ -1,6 +1,8 @@
 package com.westminster.model;
 
-public abstract class Product {
+import java.io.Serializable;
+
+public abstract class Product implements Serializable {
     //instance variables
     private String productID; //ID of the product
     public static final int PRODUCTIDLENGTH = 8; //length of the product ID

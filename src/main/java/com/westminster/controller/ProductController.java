@@ -48,12 +48,12 @@ public class ProductController {
     public void addProduct() throws Exception {
         Product product = createNewProduct();
         try {
-            if (ProductDao.isFull()) {
+            if (ProductDao.getProductCount()<=50) {
                 if (Validator.validateNewProduct(product)) {
                     if(product.getType() == ProductType.Clothing)
-                        ProductDao.addClothingProduct((Clothing) product);
+                        ProductDao.addProduct((Clothing) product);
                     else
-                        ProductDao.addElectronicsProduct((Electronics) product);
+                        ProductDao.addProduct((Electronics) product);
                     productView.printMessage("Product added successfully");
                 }
             } else {
@@ -68,7 +68,7 @@ public class ProductController {
         Product product;
         try{
             String productID = Validator.validateProductID(productView);
-            if (ProductDao.doesExist(productID)) {
+            if (ProductDao.doesProductExist(productID)) {
                 productView.printMessage(ProductView.PRODUCTFOUND);
                 product = createProduct(productID);
                 if (product.getType() == ProductType.Clothing) {
@@ -87,13 +87,15 @@ public class ProductController {
 
     }
 
-    public void deleteProduct() throws Exception {
+    public void deleteProduct()  {
         try{
             String productID = Validator.validateProductID(productView);
-            Product product = ProductDao.getProductFromHashmap(productID);
-            assert product != null;
-            ProductDao.deleteProduct(product);
-            productView.printMessage("Product deleted successfully");
+            if (ProductDao.doesProductExist(productID)) {
+                ProductDao.deleteProduct(productID);
+                productView.printMessage("Product deleted successfully");
+            } else {
+                productView.printError(ProductView.PRODUCTNOTFOUND);
+            }
         } catch (Exception e){
             productView.printError(e.getMessage());
         }

@@ -2,6 +2,7 @@ package com.westminster.util;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.westminster.dao.ProductDao;
+import com.westminster.dao.UserDao;
 import com.westminster.model.ClothingSize;
 import com.westminster.model.Product;
 import com.westminster.model.ProductType;
@@ -72,16 +73,52 @@ public abstract class Validator {
         }
         return bcryptHashString;
     }
-    private static boolean regexMatcher(String argument, String regex){
+    public static boolean regexMatcher(String argument, String regex){
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(argument);
         return matcher.matches();
     }
-    public static boolean checkPasswordHash(String password_plaintext, String stored_hash) {
+    public static boolean checkPasswordHash(String username, String password_plaintext) {
+        String stored_hash = UserDao.getUserPasswordHash(username);
         if(null == stored_hash || !stored_hash.startsWith("$2a$"))
             throw new java.lang.IllegalArgumentException("Invalid hash provided for comparison");
         return BCrypt.verifyer().verify(password_plaintext.toCharArray(), stored_hash).verified;
+    }
 
+    public static boolean doesUserExist(String username){
+        return UserDao.doesExist(username);
+    }
+
+    public static String validateUsername(UserView userView){
+        try{
+            String username = userView.callArgument(UserView.USERNAMEPROMPT);
+            if (!username.isBlank()){
+                if (!doesUserExist(username)){
+                    return username;
+                } else {
+                    throw new IllegalArgumentException("Username already exists");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid username");
+            }
+        } catch (Exception e){
+            userView.printError(e.getMessage());
+            return validateUsername(userView);
+        }
+    }
+
+    public static String validateNonEmpty(UserView userView, String prompt){
+        try{
+            String arg = userView.callArgument(prompt);
+            if (!arg.isBlank()){
+                return arg;
+            } else {
+                throw new IllegalArgumentException("Invalid argument");
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return validateNonEmpty(userView, prompt);
+        }
     }
 
     /**
@@ -91,7 +128,7 @@ public abstract class Validator {
      * @throws Exception exception
      */
     public static boolean validateNewProduct(Product product) throws Exception {
-        return ProductDao.isFull() && !ProductDao.doesExist(product.getProductID());
+        return ProductDao.getProductCount()<50 && !ProductDao.doesProductExist(product.getProductID());
     }
 
     public static String validateProductID(ProductView productView) {

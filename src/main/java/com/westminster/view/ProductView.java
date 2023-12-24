@@ -1,6 +1,5 @@
 package com.westminster.view;
 
-import com.westminster.dao.ProductDao;
 
 import java.util.Scanner;
 

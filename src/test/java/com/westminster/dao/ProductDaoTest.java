@@ -1,10 +1,6 @@
 package com.westminster.dao;
 
-import com.westminster.model.Electronics;
-import com.westminster.model.ProductType;
 import org.junit.jupiter.api.*;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ProductDaoTest {
 
@@ -28,7 +24,7 @@ class ProductDaoTest {
 
     @Test
     void doesExist() throws ProductDao.ProductDaoException {
-        Assertions.assertTrue(ProductDao.doesExist("E002"));
+        Assertions.assertTrue(ProductDao.doesProductExist("E002"));
     }
 
     @Test
