@@ -68,11 +68,12 @@ public abstract class Product implements Serializable {
     //toString method
     @Override
     public String toString() {
-        return "Product{" +
-                "productID='" + productID + '\'' +
-                ", productName='" + productName + '\'' +
-                ", availableItems=" + availableItems +
-                ", price=" + price +
-                '}';
+        return
+                "productID=" + productID + '\n' +
+                "- productName=" + productName + '\n' +
+                "- availableItems=" + availableItems + '\n' +
+                "- price=" + price +"£\n";
     }
+
+    public abstract String toStringConsole();
 }

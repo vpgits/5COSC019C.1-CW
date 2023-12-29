@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ProductDao {
 
@@ -311,6 +312,19 @@ public class ProductDao {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    public static List<Product> getAllProducts(){
+        ArrayList<Product> products = new ArrayList<>();
+        try{
+            products.addAll(getProducts(ProductType.Clothing));
+            products.addAll(getProducts(ProductType.Electronics));
+            products.sort((p1, p2)->p1.getProductID().compareTo(p2.getProductID()));
+            return products;
+        } catch (Exception e){
+            System.err.println(e.getMessage());
+        }
+        return products;
     }
 
 

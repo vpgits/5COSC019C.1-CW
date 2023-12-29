@@ -19,6 +19,17 @@ public class Electronics extends Product implements Serializable {
                 ;
     }
 
+
+    public String toStringConsole() {
+        return
+                super.toString() +
+                "- brand='" + brand + '\n' +
+                "- model='" + model + '\n' +
+                "- type='" + type + '\n' +
+                "- warranty=" + warranty+'\n'
+                ;
+    }
+
     //default constructor
     public Electronics() {
         super();

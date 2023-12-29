@@ -2,62 +2,75 @@ package com.westminster.controller;
 
 import com.westminster.interfaces.ShoppingManager;
 import com.westminster.view.GuiView;
+import com.westminster.view.SignInUpView;
 import com.westminster.view.WestminsterShoppingManagerView;
 
-public abstract class WestminsterShoppingManagerController implements ShoppingManager {
+import javax.swing.*;
+import java.util.Scanner;
+
+public class WestminsterShoppingManagerController implements ShoppingManager {
 
     private static WestminsterShoppingManagerController westminsterShoppingManagerController;
     private static ProductController productController;
+
     private WestminsterShoppingManagerController() {
         super();
         productController = new ProductController();
     }
 
-    public static WestminsterShoppingManagerController getInstance(){
-        if (westminsterShoppingManagerController == null){
-            westminsterShoppingManagerController = new WestminsterShoppingManagerController() {
-            };
+    public static WestminsterShoppingManagerController getInstance() {
+        if (westminsterShoppingManagerController == null) {
+            westminsterShoppingManagerController = new WestminsterShoppingManagerController();
         }
         return westminsterShoppingManagerController;
     }
 
-    public void menu(String input) throws Exception{
-        switch (input) {
-            case "1":
-                addProduct();
-                break;
-            case "2":
-                updateProduct();
-                break;
-            case "3":
-                deleteProduct();
-                break;
-            case "4":
-                WestminsterShoppingManagerView.start();
-                break;
-            case "5":
-                launchGUI();
-                break;
-            case "6":
-                WestminsterShoppingManagerView.printMessage("Thank you for using the system");
-                System.exit(0);
-                break;
-            default:
-                WestminsterShoppingManagerView.printError("Invalid input");
-                System.out.flush();
-                break;
+    public void menu(String input) {
+
+        boolean exit = false;
+        while (!exit) {
+            Scanner scanner = new Scanner(System.in);
+            WestminsterShoppingManagerView.getInstance().printMenuOptions();
+
+            String input1 = scanner.nextLine();
+            switch (input1) {
+                case "1":
+                    addProduct();
+                    break;
+                case "2":
+                    deleteProduct();
+                    break;
+                case "3":
+                    printAllProducts();
+                    break;
+                case "4":
+                    saveProducts();
+                    break;
+                case "5":
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+                    break;
+            }
         }
     }
-    public void addProduct() throws Exception {
+
+
+    public void addProduct() {
         productController.addProduct();
     }
-    public void updateProduct() throws Exception {
-        productController.updateProduct();
-    }
-    public void deleteProduct() throws Exception {
+
+    public void deleteProduct() {
         productController.deleteProduct();
     }
-    public void launchGUI() throws Exception {
-        GuiView.start();
+
+    public void printAllProducts() {
+        productController.printAllProducts();
+    }
+
+    public void saveProducts() {
+        System.out.println("Already saved to the database");
+        System.out.flush();
     }
 }

@@ -91,8 +91,11 @@ public class ShoppingCartDao {
             if (product == null) {
                 throw new IllegalStateException("Product must not be null for ID: " + productId);
             }
-            if (product.getAvailableItems() + (deviation) > 0){
-                if(product.getAvailableItems()+(deviation)<= ProductDao.getCurrentStock(productId)){
+            if (product.getAvailableItems() + (deviation) >= 0){
+                int i0 = product.getAvailableItems();
+                int i = product.getAvailableItems()+deviation;
+                int i1 = ProductDao.getCurrentStock(productId) - deviation;
+                if((deviation)<= ProductDao.getCurrentStock(productId)){
                     product.setAvailableItems(product.getAvailableItems()+(deviation));
                     shoppingCart.updateProduct(product);
                     ProductDao.updateStock(productId, ProductDao.getCurrentStock(productId) - (deviation));

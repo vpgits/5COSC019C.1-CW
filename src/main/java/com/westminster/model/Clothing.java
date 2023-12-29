@@ -57,9 +57,18 @@ public class Clothing extends Product implements Serializable {
     @Override
     public String toString() {
         return
-                "brand='" + brand + '\n' +
-                ", size='" + size + '\n' +
-                ", type='" + type + '\n' +
-                ", color='" + color + '\n' ;
+                " brand=" + brand + '\n' +
+                " size" + size + '\n' +
+                " type=" + type + '\n' +
+                " color=" + color + '\n' ;
+    }
+
+    public String toStringConsole(){
+        return
+                super.toString() +
+                "- brand=" + brand + '\n' +
+                "- size=" + size + '\n' +
+                "- type=" + type + '\n' +
+                "- color=" + color + '\n' ;
     }
 }

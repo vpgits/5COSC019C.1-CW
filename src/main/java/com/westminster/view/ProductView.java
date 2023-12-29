@@ -4,6 +4,7 @@ package com.westminster.view;
 import java.util.Scanner;
 
 public class ProductView {
+    private static ProductView productView;
     public static final String PRODUCTIDPROMPT = "Enter the product ID: ";
     public static final String PRODUCTNAMEPROMPT = "Enter the product name: ";
     public static final String AVAILABLEITEMSPROMPT = "Enter the available items stock: ";
@@ -25,8 +26,15 @@ public class ProductView {
     public static final String ELECTRONICPRODUCTTYPEPROMPT = "Enter the type of the electronic product:";
     Scanner scanner = new Scanner(System.in);
 
-    public ProductView() {
+    private ProductView() {
         super();
+    }
+
+    public static synchronized ProductView getInstance() {
+        if (productView == null) {
+            productView = new ProductView();
+        }
+        return productView;
     }
 
     public void printMessage(String message) {
