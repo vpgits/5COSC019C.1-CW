@@ -13,6 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Validator {
+    private static ProductDao productDao = new ProductDao();
+    private static UserDao userDao = new UserDao();
 
     private Validator(){
         throw new AssertionError("Utility class cannot be instantiated");
@@ -23,7 +25,6 @@ public abstract class Validator {
      * @return String email
      */
     public static String validateEmail(UserView userview){
-        //TODO check against the database if the email is already taken. create a hashmap with email as the key and the user object as the value
         boolean isValid = false;
         String email = null;
         while(!isValid){
@@ -79,14 +80,14 @@ public abstract class Validator {
         return matcher.matches();
     }
     public static boolean checkPasswordHash(String username, String password_plaintext) {
-        String stored_hash = UserDao.getUserPasswordHash(username);
+        String stored_hash = userDao.getUserPasswordHash(username);
         if(null == stored_hash || !stored_hash.startsWith("$2a$"))
             throw new java.lang.IllegalArgumentException("Invalid hash provided for comparison");
         return BCrypt.verifyer().verify(password_plaintext.toCharArray(), stored_hash).verified;
     }
 
     public static boolean doesUserExist(String username){
-        return UserDao.doesExist(username);
+        return userDao.doesExist(username);
     }
 
     public static String validateUsername(UserView userView){
@@ -128,7 +129,7 @@ public abstract class Validator {
      * @throws Exception exception
      */
     public static boolean validateNewProduct(Product product) throws Exception {
-        return ProductDao.getProductCount()<50 && !ProductDao.doesProductExist(product.getProductID());
+        return productDao.getProductCount()<50 && !productDao.doesProductExist(product.getProductID());
     }
 
     public static String validateProductID(ProductView productView) {
@@ -238,5 +239,9 @@ public abstract class Validator {
             productView.printError(e.getMessage());
             return validateWarranty(productView);
         }
+    }
+
+    public static String hashPassword(String password) {
+        return BCrypt.withDefaults().hashToString(12, password.toCharArray());
     }
 }

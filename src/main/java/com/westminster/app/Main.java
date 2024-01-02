@@ -15,6 +15,7 @@ public class Main {
     }
 
     private static void menu(){
+        WestminsterShoppingManagerController controller = new WestminsterShoppingManagerController();
         try(Scanner scanner = new Scanner(System.in)){
             boolean exit = false;
             while (!exit) {
@@ -22,21 +23,18 @@ public class Main {
                 String input = scanner.nextLine();
                 switch (input){
                     case "1":{
-                        SwingUtilities.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    SignInUpView signInUpView = new SignInUpView();
-                                    signInUpView.setVisible(true);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+                        SwingUtilities.invokeLater(() -> {
+                            try {
+                                SignInUpView signInUpView = new SignInUpView();
+                                signInUpView.setVisible(true);
+                            } catch (Exception e) {
+                                throw new RuntimeException("Error occurred while loading the GUI");
                             }
                         });
                         break;
                     }
                     case "2":{
-                        WestminsterShoppingManagerController.getInstance().menu(input);
+                        controller.menu();
                         break;
                     }
                     case "3":{

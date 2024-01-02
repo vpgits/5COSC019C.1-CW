@@ -15,8 +15,10 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
     private static final JButton shoppingCartButton = new JButton("Shopping Cart");
     private static JComboBox<String> categoryComboBox;
     private final String[] columnNames = {"Product ID", "Name", "Category", "Price(£)", "Info"};
-    private String username = null;
+    private final String username;
     private JTable productTable;
+    private final ShoppingCartDao shoppingCartDao = new ShoppingCartDao();
+    private final ProductDao productDao = new ProductDao();
 
     public WestminsterShoppingCenterGuiView(String username) throws ProductDao.ProductDaoException {
 
@@ -50,7 +52,7 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            WestminsterShoppingCenterGuiView view = null;
+            WestminsterShoppingCenterGuiView view;
             try {
                 view = new WestminsterShoppingCenterGuiView("test");
 
@@ -95,7 +97,7 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             int activeRow = productTable.getSelectedRow();
             if (activeRow != -1) {
                 String productID = (String) productTable.getValueAt(activeRow, 0);
-                ShoppingCartDao.addProductToShoppingCart(username, productID, 1);
+                shoppingCartDao.addProductToShoppingCart(username, productID, 1);
             }
 
         });
@@ -141,7 +143,7 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
                     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                         Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                         String productId = table.getValueAt(row, 0).toString();
-                        int stock = ProductDao.getCurrentStock(productId);
+                        int stock = productDao.getCurrentStock(productId);
 
                         if (stock < 3) {
                             renderer.setForeground(Color.RED); // Items with reduced availability in red
@@ -174,13 +176,13 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         private ArrayList<Product> fetchDataForTable(String selectedCategory) {
             ArrayList<Product> products = new ArrayList<>();
             try {
-                if (selectedCategory.equals("All")) {
-                    products.addAll(ProductDao.getProducts(ProductType.Electronics));
-                    products.addAll(ProductDao.getProducts(ProductType.Clothing));
-                } else if (selectedCategory.equals("Clothing")) {
-                    products.addAll(ProductDao.getProducts(ProductType.Clothing));
-                } else if (selectedCategory.equals("Electronics")) {
-                    products.addAll(ProductDao.getProducts(ProductType.Electronics));
+                switch (selectedCategory) {
+                    case "All" -> {
+                        products.addAll(productDao.getProducts(ProductType.Electronics));
+                        products.addAll(productDao.getProducts(ProductType.Clothing));
+                    }
+                    case "Clothing" -> products.addAll(productDao.getProducts(ProductType.Clothing));
+                    case "Electronics" -> products.addAll(productDao.getProducts(ProductType.Electronics));
                 }
             } catch (ProductDao.ProductDaoException e) {
                 throw new WestminsterShoppingCenterGuiError(e.getMessage());
@@ -222,7 +224,7 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             panel.add(new JLabel("Category: " + category));
             panel.add(new JLabel("Price: " + price));
             panel.add(new JLabel("Info: " + info));
-            panel.add(new JLabel("Quantity: " + ProductDao.getCurrentStock(productID)));
+            panel.add(new JLabel("Quantity: " + productDao.getCurrentStock(productID)));
             panel.revalidate();
             panel.repaint();
             panel.setVisible(true);

@@ -1,8 +1,6 @@
 package com.westminster.model;
 
-import java.io.Serializable;
-
-public class Electronics extends Product implements Serializable {
+public class Electronics extends Product {
     //instance variables
     private String brand; //brand of the electronic product
     private String model; //model of the electronic product
@@ -12,10 +10,10 @@ public class Electronics extends Product implements Serializable {
     @Override
     public String toString() {
         return
-                "brand='" + brand + '\n' +
-                ", model='" + model + '\n' +
-                ", type='" + type + '\n' +
-                ", warranty=" + warranty
+                " brand : " + brand + '\n' +
+                " model : " + model + '\n' +
+                " type : " + type + '\n' +
+                " warranty : " + warranty
                 ;
     }
 
@@ -23,10 +21,10 @@ public class Electronics extends Product implements Serializable {
     public String toStringConsole() {
         return
                 super.toString() +
-                "- brand='" + brand + '\n' +
-                "- model='" + model + '\n' +
-                "- type='" + type + '\n' +
-                "- warranty=" + warranty+'\n'
+                "- brand : " + brand + '\n' +
+                "- model : " + model + '\n' +
+                "- type : " + type + '\n' +
+                "- warranty : " + warranty+'\n'
                 ;
     }
 

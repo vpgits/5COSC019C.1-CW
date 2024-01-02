@@ -2,8 +2,6 @@ package com.westminster.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class ShoppingCart implements Serializable {
@@ -24,11 +22,16 @@ public class ShoppingCart implements Serializable {
     }
 
     public void removeProduct(String productId) {
-        products.remove(productId);
+       products.remove( products.stream().filter(product -> product.getProductID().equals(productId)).findFirst().orElse(null));
     }
 
     public void updateProduct(Product product) {
-        products.set(products.indexOf(product), product);
+        for (int i = 0; i < products.size(); i++) {
+            if (products.get(i).getProductID().equals(product.getProductID())) {
+                products.set(i, product);
+                break;
+            }
+        }
     }
 
     public ArrayList<Product> getProducts() {
@@ -43,9 +46,6 @@ public class ShoppingCart implements Serializable {
         return getTotalPrice()*( discountPercentage);
     }
 
-    public double getFinalPrice(double discountPercentage){
-        return getTotalPrice() - getDiscount(discountPercentage);
-    }
 
     public void clear() {
         products.clear();

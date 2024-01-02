@@ -1,8 +1,7 @@
 package com.westminster.model;
 
-import java.io.Serializable;
 
-public class Clothing extends Product implements Serializable {
+public class Clothing extends Product {
     //instance variables
     private String brand; //brand of the clothing product
     private ClothingSize size; //size of the clothing product(S/M/L/XL)
@@ -57,18 +56,18 @@ public class Clothing extends Product implements Serializable {
     @Override
     public String toString() {
         return
-                " brand=" + brand + '\n' +
-                " size" + size + '\n' +
-                " type=" + type + '\n' +
-                " color=" + color + '\n' ;
+                " brand : " + brand + '\n' +
+                " size : " + size + '\n' +
+                " type : " + type + '\n' +
+                " color : " + color + '\n' ;
     }
 
     public String toStringConsole(){
         return
                 super.toString() +
-                "- brand=" + brand + '\n' +
-                "- size=" + size + '\n' +
-                "- type=" + type + '\n' +
-                "- color=" + color + '\n' ;
+                "- Brand : " + brand + '\n' +
+                "- Size : " + size + '\n' +
+                "- Type : " + type + '\n' +
+                "- Color : " + color + '\n' ;
     }
 }

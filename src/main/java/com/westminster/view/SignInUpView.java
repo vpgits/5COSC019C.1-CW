@@ -22,6 +22,7 @@ import com.westminster.dao.UserDao;
 import com.westminster.util.Validator;
 
 public class SignInUpView extends JFrame {
+    private UserDao userDao = new UserDao();
 
     public SignInUpView() {
         initComponents();
@@ -78,8 +79,7 @@ public class SignInUpView extends JFrame {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
@@ -97,8 +97,6 @@ public class SignInUpView extends JFrame {
                 } else {
                     System.out.println("User does not exist");
                 }
-                System.out.println(username + " " + password);
-                
             }
         });
 
@@ -182,17 +180,22 @@ public class SignInUpView extends JFrame {
                 String email  =  signUpEmailField.getText();
                 if (username.isBlank() || password.isBlank() || firstName.isBlank() || lastName.isBlank() || email.isBlank()) {
                     signUpMessageLable.setText("Please fill in all fields.");
+                    return;
                 }
                 if (Validator.doesUserExist(username)) {
                     signUpMessageLable.setText("Username already exists.");
+                    return;
                 } else if (!Validator.regexMatcher(email, "^[A-Za-z0-9+_.-]+@(.+)$")){
                     signUpMessageLable.setText("Please enter a valid email");
+                    return;
                 }
                 if (!Validator.regexMatcher(password, "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,16}$")){
-                    signUpMessageLable.setText("Please enter a valid password");    
+                    signUpMessageLable.setText("Please enter a valid password");
+                    return;
                 }
                 try {
-                    UserDao.addUser(username, password,firstName ,lastName, email);
+                    password = Validator.hashPassword(password);
+                    userDao.addUser(username, password,firstName ,lastName, email);
                     signUpMessageLable.setText("User Added");
                 } catch (UserDao.UserDaoException e) {
                     signUpMessageLable.setText("Something went wrong.");
@@ -205,7 +208,7 @@ public class SignInUpView extends JFrame {
         tabbedPane.addTab("Sign Up", signUpPanel);
 
         add(tabbedPane);
-        setSize(350, 300);
+        setSize(450, 300);
         setTitle("Welcome");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

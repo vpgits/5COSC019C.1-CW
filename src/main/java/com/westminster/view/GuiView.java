@@ -1,6 +1,5 @@
 package com.westminster.view;
 
-import javax.swing.*;
 
 public class GuiView {
 

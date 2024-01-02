@@ -69,10 +69,10 @@ public abstract class Product implements Serializable {
     @Override
     public String toString() {
         return
-                "productID=" + productID + '\n' +
-                "- productName=" + productName + '\n' +
-                "- availableItems=" + availableItems + '\n' +
-                "- price=" + price +"£\n";
+                "Product ID : " + productID + '\n' +
+                "- Product Name : " + productName + '\n' +
+                "- Available Items : " + availableItems + '\n' +
+                "- Price : " + price +"£\n";
     }
 
     public abstract String toStringConsole();

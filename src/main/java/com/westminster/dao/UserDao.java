@@ -1,12 +1,10 @@
 package com.westminster.dao;
 
-import com.westminster.model.User;
+
 import com.westminster.util.SQLiteConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Data Access Object for User
@@ -15,7 +13,7 @@ public class UserDao {
     /**
      * Private constructor to prevent instantiation
      */
-    private UserDao() {
+    public UserDao() {
         super();
     }
 
@@ -25,7 +23,7 @@ public class UserDao {
      * @param password password
      * @throws UserDaoException User DAO error
      */
-    public static void addUser(String username, String password, String fname,String lname, String email) throws UserDaoException{
+    public  void addUser(String username, String password, String fname,String lname, String email) throws UserDaoException{
         if(getUserCount()>=50){
             throw new UserDaoException("User limit reached");
         }
@@ -44,8 +42,21 @@ public class UserDao {
         }
     }
 
+    public void removeUser(String username) throws UserDaoException{
+        String sql = "DELETE FROM user WHERE username = ?";
+        try (
+                Connection conn = SQLiteConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            pstmt.setString(1, username);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            throw new UserDaoException("Error removing user: " + e.getMessage());
+        }
+    }
 
-    public static boolean doesExist(String username) {
+
+    public  boolean doesExist(String username) {
         String sql = "SELECT username FROM user WHERE username = ?";
         try(
             Connection conn = SQLiteConnection.connect();
@@ -65,9 +76,8 @@ public class UserDao {
      * Gets the password hash of a user
      * @param username username
      * @return password has of the user
-     * @throws UserDaoException User DAO error
      */
-    public static String getUserPasswordHash(String username) {
+    public  String getUserPasswordHash(String username) {
         String sql = "SELECT password  FROM user WHERE username = ?";
         try(
                 Connection conn = SQLiteConnection.connect();
@@ -86,7 +96,7 @@ public class UserDao {
         }
     }
 
-    public static int getUserCount() {
+    public  int getUserCount() {
         String sql = "SELECT COUNT(*) FROM user";
         try(
                 Connection conn = SQLiteConnection.connect();
@@ -104,13 +114,8 @@ public class UserDao {
     }
 
 
-    public static class UserDaoException extends Exception {
+    public static class UserDaoException extends RuntimeException {
         public UserDaoException(String message) {
-            super(message);
-        }
-    }
-    public static class UserDoesNotExistException extends Exception {
-        public UserDoesNotExistException(String message) {
             super(message);
         }
     }
