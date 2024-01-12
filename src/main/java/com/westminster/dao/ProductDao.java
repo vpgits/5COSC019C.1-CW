@@ -404,7 +404,8 @@ public class ProductDao {
             FileInputStream fis = new FileInputStream(String.valueOf(resourcePath));
             ObjectInputStream ois = new ObjectInputStream(fis);
             Object oisObject = ois.readObject();
-            if (oisObject instanceof HashMap<?, ?> rawMap) {
+            if (oisObject instanceof Map<?, ?>) {
+                Map<?, ?> rawMap = (Map<?, ?>) oisObject;
                 for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
                     if (entry.getKey() instanceof String && entry.getValue() instanceof Product) {
                         products.put((String) entry.getKey(), (Product) entry.getValue());

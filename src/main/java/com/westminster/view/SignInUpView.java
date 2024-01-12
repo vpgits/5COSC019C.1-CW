@@ -1,5 +1,6 @@
 package com.westminster.view;
 
+import com.westminster.controller.UserController;
 import com.westminster.dao.ProductDao;
 import com.westminster.dao.UserDao;
 import com.westminster.util.Validator;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 public class SignInUpView extends JFrame {
     private static final ArrayList<String> activeUsers = new ArrayList<String>();
     private final UserDao userDao = new UserDao();
+    private final UserController userController = new UserController();
 
     public SignInUpView() {
         initComponents();
@@ -85,13 +87,8 @@ public class SignInUpView extends JFrame {
                     signInMessageLabel.setText("User already logged in.");
                     return;
                 }
-                if (Validator.checkPasswordHash(username, password)) {
-                    signInMessageLabel.setText("User logged in successfully.");
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                if (userController.logIn(username, password)) {
+                    JOptionPane.showMessageDialog(null, "User logged in successfully.");
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             Window currentWindow = SwingUtilities.getWindowAncestor((Component) event.getSource());
@@ -209,8 +206,11 @@ public class SignInUpView extends JFrame {
                 }
                 try {
                     password = Validator.hashPassword(password);
-                    userDao.addUser(username, password, firstName, lastName, email);
-                    signUpMessageLable.setText("User Added");
+                    if(userController.signUp(username, password, firstName, lastName, email)){
+                        signUpMessageLable.setText("User Added");
+                    } else {
+                        signUpMessageLable.setText("User limit reached.");
+                    }
                 } catch (UserDao.UserDaoException e) {
                     signUpMessageLable.setText("Something went wrong.");
                 }

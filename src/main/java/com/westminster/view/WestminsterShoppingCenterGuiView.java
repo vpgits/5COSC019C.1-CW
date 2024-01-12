@@ -14,7 +14,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class contains methods for WestminsterShoppingCenterGuiView/ GUI.
+ */
 public class WestminsterShoppingCenterGuiView extends JFrame {
+    // instance variables
     private final JButton shoppingCartButton = new JButton("Shopping Cart");
     private final JButton refreshButton = new JButton("Refresh");
     private JComboBox<String> categoryComboBox;
@@ -26,6 +30,11 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
 
     private boolean isCartRunning = false;
 
+    /**
+     * Constructs a WestminsterShoppingCenterGuiView object with the specified parameters.
+     * @param username username of the user
+     * @throws ProductDao.ProductDaoException if there is an error with the ProductDao
+     */
     public WestminsterShoppingCenterGuiView(String username) throws ProductDao.ProductDaoException {
 
         setTitle("Westminster Shopping Centre");
@@ -66,6 +75,10 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
 
     }
 
+    /**
+     * Creates the top panel of the GUI.
+     * @return JPanel
+     */
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.add(new JLabel("Select Product Category"));
@@ -76,6 +89,10 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         return topPanel;
     }
 
+    /**
+     * Main method.
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             WestminsterShoppingCenterGuiView view;
@@ -89,6 +106,10 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         });
     }
 
+    /**
+     * Creates the center panel of the GUI.
+     * @return JScrollPane
+     */
     private JScrollPane createCenterPanel() {
         productTable = new ProductTable();
         JScrollPane scrollPane = new JScrollPane(productTable);
@@ -96,6 +117,10 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         return scrollPane;
     }
 
+    /**
+     * Creates the bottom panel of the GUI.
+     * @return JPanel
+     */
     private JPanel createBottomPanel() {
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
@@ -119,12 +144,15 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             }
 
         });
-
+        /**
+         * Adds the selected product to the shopping cart.
+         */
         addToCartButton.addActionListener(e -> {
             int activeRow = productTable.getSelectedRow();
             if (activeRow != -1) {
                 String productID = (String) productTable.getValueAt(activeRow, 0);
                 shoppingCartDao.addProductToShoppingCart(username, productID, 1);
+                ShoppingCartGuiView.getInstance(username).refreshTable(username);
             }
 
         });
@@ -132,6 +160,11 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         return bottomPanel;
     }
 
+    /**
+     * Gets the data formatted for the table.
+     * @param data data to be formatted
+     * @return Object[][]
+     */
     public Object[][] getDataFormattedForTable(List<Product> data) {
         try {
             return data.stream().map(c -> new Object[]{c.getProductID(), c.getProductName(), c.getType().toString(),
@@ -141,12 +174,18 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         }
     }
 
+    /**
+     * This class is used to throw WestminsterShoppingCenterGuiError exceptions.
+     */
     private static class WestminsterShoppingCenterGuiError extends RuntimeException {
         public WestminsterShoppingCenterGuiError(String message) {
             super(message);
         }
     }
 
+    /**
+     * This class is used to create the product table.
+     */
     private class ProductTable extends JTable {
 
         public ProductTable() {
@@ -158,11 +197,20 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             setupComboBox();
         }
 
+        /**
+         * Returns true if the cell at <code>row</code> and <code>column</code>
+         * @param row      the row whose value is to be queried
+         * @param column   the column whose value is to be queried
+         * @return true if the cell is editable
+         */
         @Override
         public boolean isCellEditable(int row, int column) {
             return false;
         }
 
+        /**
+         * Formats the table.
+         */
         public void format() {
             refreshTableModel();
 
@@ -182,6 +230,9 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
 
         }
 
+        /**
+         * Refreshes the table model.
+         */
         private void refreshTableModel() {
             setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
                 @Override
@@ -189,6 +240,17 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
                     super.setHorizontalAlignment(SwingConstants.CENTER);
                 }
 
+                /**
+                 * Returns the <code>Component</code> used for drawing the cell.
+                 * @param table  the <code>JTable</code>
+                 * @param value  the value to assign to the cell at
+                 *                  <code>[row, column]</code>
+                 * @param isSelected true if cell is selected
+                 * @param hasFocus true if cell has focus
+                 * @param row  the row of the cell to render
+                 * @param column the column of the cell to render
+                 * @return
+                 */
                 @Override
                 public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                                                                boolean hasFocus, int row, int column) {
@@ -210,6 +272,9 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
 
         }
 
+        /**
+         * Sets up the timer. for refreshing the table.
+         */
         private void setupTimer() {
             Timer timer = new Timer(1000, e -> {
                 refreshTableModel();
@@ -217,6 +282,9 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             timer.start();
         }
 
+        /**
+         * Sets up the combo box.
+         */
         private void setupComboBox() {
             categoryComboBox.addActionListener(e -> {
                 String selectedCategory = (String) categoryComboBox.getSelectedItem();
@@ -225,12 +293,21 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             });
         }
 
+        /**
+         * Updates the table.
+         * @param selectedCategory selected category
+         */
         private void updateTable(String selectedCategory) {
             setModel(new DefaultTableModel(getDataFormattedForTable(fetchDataForTable(selectedCategory)), columnNames));
             revalidate();
             repaint();
         }
 
+        /**
+         * Fetches the data for the table.
+         * @param selectedCategory selected category
+         * @return ArrayList<Product>
+         */
         public static ArrayList<Product> fetchDataForTable(String selectedCategory) {
             ProductDao productDao = new ProductDao();
             ArrayList<Product> products = new ArrayList<>();
@@ -250,6 +327,9 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         }
     }
 
+    /**
+     * This class is used to create the details panel.
+     */
     private class DetailsPanel extends JPanel {
         private final JPanel panel;
         JLabel selectedProductDetailsJLabel = new JLabel("Selected Product-Details");
@@ -260,6 +340,9 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
         JLabel infoJLabel = new JLabel("Info: ");
         JLabel quantityJLabel = new JLabel("Quantity: ");
 
+        /**
+         * Constructs a DetailsPanel object.
+         */
         public DetailsPanel() {
             super();
             this.panel = new JPanel();
@@ -283,6 +366,9 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             });
         }
 
+        /**
+         * Updates the panel.
+         */
         private void updatePanel() {
             int activeRow = productTable.getSelectedRow();
             if (activeRow == -1) {
