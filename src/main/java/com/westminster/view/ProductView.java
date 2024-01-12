@@ -5,6 +5,7 @@ import com.westminster.interfaces.View;
 import java.util.Scanner;
 
 public class ProductView implements View {
+    //utility prompts
     public static final String PRODUCTIDPROMPT = "Enter the product ID: ";
     public static final String PRODUCTNAMEPROMPT = "Enter the product name: ";
     public static final String AVAILABLEITEMSPROMPT = "Enter the available items stock: ";
@@ -23,23 +24,45 @@ public class ProductView implements View {
     public static final String WARRANTYPROMPT = "Enter the warranty of the electronic product in months: ";
     public static final String PRODUCTTYPEERROR = "Invalid product type";
     public static final String ELECTRONICPRODUCTTYPEPROMPT = "Enter the type of the electronic product:";
+    public static final String PRODUCTALREADYEXISTS = "Product already exists";
 
+    /**
+     * Constructor for the ProductView class.
+     */
     public ProductView() {
         super();
     }
 
+    /**
+     * This method is used to get user input.
+     *
+     * @param message The prompt to be displayed.
+     */
     public void printMessage(String message) {
+        System.out.flush();
         System.out.println(message);
     }
 
+    /**
+     * This method is used to print errors.
+     *
+     * @param message The error message to be printed.
+     */
     public void printError(String message) {
+        System.out.flush();
         System.err.println(message);
     }
 
+    /**
+     * This method is used to get user input.
+     *
+     * @param prompt The prompt to be displayed.
+     */
     public String callArgument(String prompt) {
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println(prompt);
-            return scanner.nextLine();
-        }
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(prompt);
+        System.out.flush();
+        return scanner.nextLine();
     }
+
 }

@@ -3,10 +3,7 @@ package com.westminster.dao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.westminster.model.Clothing;
-import com.westminster.model.ClothingSize;
-import com.westminster.model.Product;
-import com.westminster.model.ShoppingCart;
+import com.westminster.model.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,21 +12,29 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 
 class ShoppingCartDaoTest {
+    // instance variables
     private static ShoppingCartDao shoppingCartDao;
     private ShoppingCart shoppingCart;
 
+    /**
+     * This method is run before all tests. Sets up the ProductDao instance.
+     */
     @BeforeAll
-    static void init()  {
+    static void init() {
         shoppingCartDao = new ShoppingCartDao();
-
     }
 
+    /**
+     * This method is run after all tests.
+     */
     @AfterAll
     static void cleanUp() {
 
     }
 
-
+    /**
+     * This method is run before each test. creates a shoppingCart under testUser and adds a product.
+     */
     @BeforeEach
     void setUp() {
         shoppingCart = shoppingCartDao.createShoppingCart("testUser");
@@ -40,6 +45,9 @@ class ShoppingCartDaoTest {
 
     }
 
+    /**
+     * This method is run after each test. removes the shoppingCart from the database and deletes the product.
+     */
     @AfterEach
     void tearDown() {
         shoppingCartDao.clearShoppingCart("testUser");
@@ -49,15 +57,20 @@ class ShoppingCartDaoTest {
 
     }
 
-
+    /**
+     * This method tests the createShoppingCart method.
+     */
     @Test
     void createShoppingCart() {
         // Test if a shopping cart is created successfully
-       
+
         assertNotNull(shoppingCart);
         assertEquals("testUser", shoppingCart.getUsername());
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void addProductToShoppingCart() {
         // Test adding a product to the shopping cart
@@ -68,6 +81,9 @@ class ShoppingCartDaoTest {
         assertEquals(1, shoppingCart.getProducts().size());
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void removeProductFromShoppingCart() {
         // Test removing a product from the shopping cart
@@ -79,6 +95,9 @@ class ShoppingCartDaoTest {
         assertEquals(0, shoppingCart.getProducts().size());
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void updateProduct() {
         // Test updating the quantity of a product in the shopping cart
@@ -90,6 +109,9 @@ class ShoppingCartDaoTest {
         assertEquals(3, shoppingCart.getProductFromTheCart("CLOTH999").getAvailableItems());
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void getProductsInShoppingCart() {
         // Test getting the products in the shopping cart
@@ -100,6 +122,9 @@ class ShoppingCartDaoTest {
         assertEquals(1, shoppingCart.getProducts().size());
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void getTotalPrice() {
         // Test getting the total price of the shopping cart
@@ -109,6 +134,9 @@ class ShoppingCartDaoTest {
         assertEquals(40.0, totalPrice);
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void getDiscount() {
         // Test getting the discount for the shopping cart
@@ -118,6 +146,9 @@ class ShoppingCartDaoTest {
         assertEquals(1.0, discount);
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void getThreeItemsInSameCategoryDiscount() {
         // Test getting the discount for having three items in the same category
@@ -127,14 +158,20 @@ class ShoppingCartDaoTest {
         assertEquals(6.0, discount);
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
-    void getfirstPurchaseDiscount() {
+    void getFirstPurchaseDiscount() {
         // Test getting the discount for the first purchase
 
         double discount = shoppingCartDao.getfirstPurchaseDiscount("testUser");
         assertEquals(0.0, discount);
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void getFinalPrice() {
         // Test getting the final price of the shopping cart
@@ -144,6 +181,9 @@ class ShoppingCartDaoTest {
         assertEquals(21.0, finalPrice);
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void clearShoppingCart() {
         // Test clearing the shopping cart
@@ -156,6 +196,9 @@ class ShoppingCartDaoTest {
         assertEquals(0, shoppingCart.getProducts().size());
     }
 
+    /**
+     * This method tests the removeShoppingCart method.
+     */
     @Test
     void getCurrentProductStock() {
         // Test getting the current stock of a product in the shopping cart

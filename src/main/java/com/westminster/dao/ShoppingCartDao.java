@@ -2,55 +2,74 @@ package com.westminster.dao;
 
 
 import com.westminster.model.Product;
-import com.westminster.model.ShoppingCart;
 import com.westminster.model.ProductType;
+import com.westminster.model.ShoppingCart;
 import com.westminster.util.SQLiteConnection;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.sql.*;
+import java.io.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+/**
+ * Data Access Object for the shopping cart.
+ */
 public class ShoppingCartDao {
-    ProductDao productDao;
+    ProductDao productDao; // productDao is used to access the product table in the database.
+
+    /**
+     * Constructor for the ShoppingCartDao class.
+     */
     public ShoppingCartDao() {
         super();
         productDao = new ProductDao();
     }
-    public  ShoppingCart createShoppingCart(String username)  {
-        ShoppingCart shoppingCart = new ShoppingCart( username);
+
+    /**
+     * Creates a new shopping cart for the user.
+     * @param username The username of the user.
+     * @return The shopping cart.
+     */
+    public ShoppingCart createShoppingCart(String username) {
+        ShoppingCart shoppingCart = new ShoppingCart(username);
         String sql = "INSERT INTO shopping_carts (username, uuid, shoppingcart) VALUES (?, ?, ?)";
-        try(
+        try (
                 Connection conn = SQLiteConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
             pstmt.setString(1, username);
             pstmt.setString(2, shoppingCart.getUuid());
             pstmt.setBytes(3, serializeShoppingCart(shoppingCart));
             pstmt.execute();
-        } catch (SQLException | IOException |SQLiteConnection.DatabaseConnectionException
-                | SQLiteConnection.DatabaseQueryException e ) {
-            throw new RuntimeException(e.getMessage());
+        } catch (SQLException | IOException | SQLiteConnection.DatabaseConnectionException
+                 | SQLiteConnection.DatabaseQueryException e) {
+            throw new ShoppingCartDaoException("Unable to create shopping cart: " + e.getMessage());
         }
         return shoppingCart;
     }
-    public  void addProductToShoppingCart(String username, String productId, int quantity) {
+
+    /**
+     * Adds a product to the shopping cart.
+     *
+     * @param username  The username of the user.
+     * @param productId The ID of the product.
+     * @param quantity  The quantity of the product.
+     */
+    public void addProductToShoppingCart(String username, String productId, int quantity) {
         ShoppingCart shoppingCart = getShoppingCart(username);
         Product product = null;
-        try{
+        try {
             if (productDao.doesProductExist(productId)) {
                 product = productDao.getProduct(productId);
                 assert product != null;
-                if (shoppingCart.isProductInTheCart(productId)){
+                if (shoppingCart.isProductInTheCart(productId)) {
                     updateProduct(username, productId, quantity);
                     return;
                 }
-                if (productDao.getCurrentStock(productId) >= quantity){
+                if (productDao.getCurrentStock(productId) >= quantity) {
                     product.setAvailableItems(quantity);
                     productDao.updateStock(productId, productDao.getCurrentStock(productId) - quantity);
                     shoppingCart.addProduct(product);
@@ -62,15 +81,22 @@ public class ShoppingCartDao {
                 throw new IllegalStateException("Product must not be null for ID: " + productId);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new ShoppingCartDaoException("Unable to add product: " + e.getMessage());
         }
-
     }
-    public  void removeProductFromShoppingCart(String username, String productId, int quantity) {
+
+    /**
+     * Removes a product from the shopping cart.
+     *
+     * @param username  The username of the user.
+     * @param productId The ID of the product.
+     * @param quantity  The quantity of the product.
+     */
+    public void removeProductFromShoppingCart(String username, String productId, int quantity) {
         ShoppingCart shoppingCart = getShoppingCart(username);
- 
-        try{
-            if (productDao.doesProductExist(productId)){
+
+        try {
+            if (productDao.doesProductExist(productId)) {
                 productDao.updateStock(productId, productDao.getCurrentStock(productId) + quantity);
                 shoppingCart.removeProduct(productId);
                 updateShoppingCart(username, shoppingCart);
@@ -78,21 +104,28 @@ public class ShoppingCartDao {
                 throw new IllegalStateException("Product must not be null for ID: " + productId);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new ShoppingCartDaoException("Unable to remove product: " + e.getMessage());
         }
     }
 
-    public  void updateProduct(String username, String productId, int deviation){
+    /**
+     * Updates the quantity of a product in the shopping cart.
+     *
+     * @param username  The username of the user.
+     * @param productId The ID of the product.
+     * @param deviation The deviation of the quantity.
+     */
+    public void updateProduct(String username, String productId, int deviation) {
         ShoppingCart shoppingCart = getShoppingCart(username);
         Product product = null;
-        try{
+        try {
             product = shoppingCart.getProductFromTheCart(productId);
             if (product == null) {
                 throw new IllegalStateException("Product must not be null for ID: " + productId);
             }
-            if (product.getAvailableItems() + (deviation) >= 0){
-                if((deviation)<= productDao.getCurrentStock(productId)){
-                    product.setAvailableItems(product.getAvailableItems()+(deviation));
+            if (product.getAvailableItems() + (deviation) >= 0) {
+                if ((deviation) <= productDao.getCurrentStock(productId)) {
+                    product.setAvailableItems(product.getAvailableItems() + (deviation));
                     shoppingCart.updateProduct(product);
                     productDao.updateStock(productId, productDao.getCurrentStock(productId) - (deviation));
                     updateShoppingCart(username, shoppingCart);
@@ -102,31 +135,57 @@ public class ShoppingCartDao {
             } else {
                 removeProductFromShoppingCart(username, productId, (deviation));
             }
-        }catch (Exception e){
-            throw new RuntimeException(e.getMessage());
+        } catch (Exception e) {
+            throw new ShoppingCartDaoException("Unable to update product: " + e.getMessage());
         }
     }
 
-    public  ArrayList<Product> getProductsInShoppingCart(String username) {
+    /**
+     * Gets the products in the shopping cart.
+     *
+     * @param username The username of the user.
+     * @return an arraylist of products in the shopping cart.
+     */
+    public ArrayList<Product> getProductsInShoppingCart(String username) {
         ShoppingCart shoppingCart = getShoppingCart(username);
         return shoppingCart.getProducts();
-
     }
-    public  double getTotalPrice(String username) {
+
+    /**
+     * Gets the total price of the products in the shopping cart.
+     *
+     * @param username The username of the user.
+     * @return The total price of the products in the shopping cart.
+     */
+    public double getTotalPrice(String username) {
         ShoppingCart shoppingCart = getShoppingCart(username);
         return shoppingCart.getTotalPrice();
     }
-    public  double getDiscount(String username, double discountPercentage){
+
+    /**
+     * Gets the discount by having a percentage of the total price.
+     *
+     * @param username           The username of the user.
+     * @param discountPercentage The percentage of the total price as decimals
+     * @return The discounted amount
+     */
+    public double getDiscount(String username, double discountPercentage) {
         ShoppingCart shoppingCart = getShoppingCart(username);
         return shoppingCart.getDiscount(discountPercentage);
     }
 
-    public   double getThreeItemsInSameCategoryDiscount(String username) {
-    	ShoppingCart shoppingCart = getShoppingCart(username);
+    /**
+     * Custom three items in the same category discount.
+     *
+     * @param username The username of the user.
+     * @return The discounted amount
+     */
+    public double getThreeItemsInSameCategoryDiscount(String username) {
+        ShoppingCart shoppingCart = getShoppingCart(username);
         ArrayList<Product> products = shoppingCart.getProducts();
         HashMap<ProductType, Integer> productCount = new HashMap<>();
         for (Product product : products) {
-            if (product.getType()==ProductType.Clothing){
+            if (product.getType() == ProductType.Clothing) {
                 if (productCount.containsKey(ProductType.Clothing)) {
                     productCount.put(ProductType.Clothing, productCount.get(ProductType.Clothing) + product.getAvailableItems());
                 } else {
@@ -149,13 +208,19 @@ public class ShoppingCartDao {
         return sum * 0.2;
     }
 
-    public  double getfirstPurchaseDiscount(String username){
+    /**
+     * Custom first purchase discount.
+     *
+     * @param username The username of the user.
+     * @return The discounted amount
+     */
+    public double getfirstPurchaseDiscount(String username) {
 
         String sql = "SELECT COUNT(*) FROM shopping_carts WHERE username = ?";
-        try(
+        try (
                 Connection conn = SQLiteConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -164,28 +229,44 @@ public class ShoppingCartDao {
                     return shoppingCart.getDiscount(0.1);
                 }
             }
-        } catch (SQLiteConnection.DatabaseQueryException |SQLiteConnection.DatabaseConnectionException |SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLiteConnection.DatabaseQueryException | SQLiteConnection.DatabaseConnectionException |
+                 SQLException e) {
+            throw new ShoppingCartDaoException("Unable to get first purchase discount: " + e.getMessage());
         }
         return 0;
     }
 
-    public  double getFinalPrice(String username) {
+    /**
+     * Gets the final price of the products in the shopping cart.
+     * @param username The username of the user.
+     * @return The final price of the products in the shopping cart.
+     */
+    public double getFinalPrice(String username) {
         ShoppingCart shoppingCart = getShoppingCart(username);
         return shoppingCart.getTotalPrice() - getfirstPurchaseDiscount(username) - getThreeItemsInSameCategoryDiscount(username);
     }
-    public  void clearShoppingCart(String username) {
+
+    /**
+     * Clears the shopping cart.
+     * @param username username
+     */
+    public void clearShoppingCart(String username) {
         ShoppingCart shoppingCart = getShoppingCart(username);
         shoppingCart.clear();
     }
 
-    public  ShoppingCart getShoppingCart(String username)  {
+    /**
+     * Gets the shopping cart, using the username.
+     * @param username The username of the user.
+     * @return
+     */
+    public ShoppingCart getShoppingCart(String username) {
 
         String sql = "SELECT shoppingcart FROM shopping_carts WHERE username = ? AND finished = 0";
-        try(
+        try (
                 Connection conn = SQLiteConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -193,73 +274,94 @@ public class ShoppingCartDao {
                 assert shoppingCart != null;
                 return shoppingCart;
             }
-        } catch (SQLiteConnection.DatabaseQueryException e) {
-            throw new RuntimeException(e);
-        } catch (SQLiteConnection.DatabaseConnectionException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+        } catch (SQLiteConnection.DatabaseQueryException | SQLiteConnection.DatabaseConnectionException |SQLException
+                | IOException | ClassNotFoundException |NullPointerException e) {
+            throw new ShoppingCartDaoException("Unable to get shopping cart: " + e.getMessage());
         }
         return createShoppingCart(username);
     }
 
-    public  void updateShoppingCart(String username, ShoppingCart shoppingCart){
+    /**
+     * Updates the shopping cart.
+     *
+     * @param username     The username of the user.
+     * @param shoppingCart The shopping cart object.
+     */
+    public void updateShoppingCart(String username, ShoppingCart shoppingCart) {
         String sql = "UPDATE shopping_carts SET shoppingcart = ? WHERE username = ?";
-        try(
+        try (
                 Connection conn = SQLiteConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
             byte[] shoppingCarBlob = serializeShoppingCart(shoppingCart);
             pstmt.setString(2, shoppingCart.getUsername());
             pstmt.setBytes(1, shoppingCarBlob);
             pstmt.executeUpdate();
-        } catch (SQLiteConnection.DatabaseQueryException | SQLiteConnection.DatabaseConnectionException | SQLException| IOException e) {
-            throw new ShoppingCartDaoException("Unable to update shopping cart: "+e.getMessage());
-        } 
-    }
-
-    public  void checkout(String username){
-        ShoppingCart shoppingCart = getShoppingCart(username);
- 
-        String sql = "UPDATE shopping_carts SET finished = 1 WHERE username = ?";
-        try(
-                Connection conn = SQLiteConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ) {
-            updateShoppingCart(username, shoppingCart);
-            pstmt.setString(1, shoppingCart.getUsername());
-            pstmt.execute();
-        } catch (SQLiteConnection.DatabaseQueryException e) {
-            throw new RuntimeException(e);
-        } catch (SQLiteConnection.DatabaseConnectionException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLiteConnection.DatabaseQueryException | SQLiteConnection.DatabaseConnectionException | SQLException |
+                 IOException e) {
+            throw new ShoppingCartDaoException("Unable to update shopping cart: " + e.getMessage());
         }
     }
 
-    public  int getCurrentProductStock(String username, String productId) {
-    	ShoppingCart shoppingCart = getShoppingCart(username);
-    	return shoppingCart.getProductFromTheCart(productId).getAvailableItems();
+    /**
+     * Checks out the shopping cart.
+     *
+     * @param username The username of the user.
+     */
+    public void checkout(String username) {
+        ShoppingCart shoppingCart = getShoppingCart(username);
+
+        String sql = "UPDATE shopping_carts SET finished = 1 WHERE username = ?";
+        try (
+                Connection conn = SQLiteConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
+            updateShoppingCart(username, shoppingCart);
+            pstmt.setString(1, shoppingCart.getUsername());
+            pstmt.execute();
+        } catch (SQLiteConnection.DatabaseQueryException | SQLiteConnection.DatabaseConnectionException |
+                 SQLException e) {
+            throw new ShoppingCartDaoException("Unable to checkout shopping cart: " + e.getMessage());
+        }
     }
 
-    private  byte[] serializeShoppingCart(ShoppingCart shoppingCart) throws IOException {
+    /**
+     * Gets the current stock of a product.
+     *
+     * @param username  username of the user
+     * @param productId id of the product
+     * @return the current stock of the product
+     */
+    public int getCurrentProductStock(String username, String productId) {
+        ShoppingCart shoppingCart = getShoppingCart(username);
+        return shoppingCart.getProductFromTheCart(productId).getAvailableItems();
+    }
+
+    /**
+     * Serializes the shopping cart.
+     *
+     * @param shoppingCart The shopping cart object.
+     * @return The serialized shopping cart.
+     * @throws IOException If the shopping cart cannot be serialized.
+     */
+    private byte[] serializeShoppingCart(ShoppingCart shoppingCart) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(shoppingCart);
         oos.close();
         baos.close();
-        byte[] serializedShoppingCart = baos.toByteArray();
-        return serializedShoppingCart;
+        return baos.toByteArray();
     }
 
-    private  ShoppingCart deserializeShoppingCart(byte[] serializedShoppingCart) throws IOException, ClassNotFoundException {
+    /**
+     * Deserializes the shopping cart.
+     *
+     * @param serializedShoppingCart The serialized shopping cart.
+     * @return ShoppingCart
+     * @throws IOException            If the shopping cart cannot be deserialized.
+     * @throws ClassNotFoundException If the shopping cart class cannot be found.
+     */
+    private ShoppingCart deserializeShoppingCart(byte[] serializedShoppingCart) throws IOException, ClassNotFoundException {
         ByteArrayInputStream bais = new ByteArrayInputStream(serializedShoppingCart);
         ObjectInputStream ois = new ObjectInputStream(bais);
         ShoppingCart shoppingCart = (ShoppingCart) ois.readObject();
@@ -268,29 +370,32 @@ public class ShoppingCartDao {
         return shoppingCart;
     }
 
+    /**
+     * removes the shopping cart from the database
+     *
+     * @param username username of the user
+     */
     public void removeShoppingCart(String username) {
         String sql = "DELETE FROM shopping_carts WHERE username = ?";
-        try(
+        try (
                 Connection conn = SQLiteConnection.connect();
-                PreparedStatement pstmt = conn.prepareStatement(sql);
-                ) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
             pstmt.setString(1, username);
             pstmt.execute();
-        } catch (SQLiteConnection.DatabaseQueryException e) {
-            throw new RuntimeException(e);
-        } catch (SQLiteConnection.DatabaseConnectionException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new ShoppingCartDaoException("Unable to remove shopping cart: " + e.getMessage());
         }
     }
 
-    public  class ShoppingCartDaoException extends RuntimeException {
+    /**
+     * Exception class for the ShoppingCartDao.
+     */
+    public static class ShoppingCartDaoException extends RuntimeException {
         public ShoppingCartDaoException(String message) {
             super(message);
         }
     }
-
 
 
 }

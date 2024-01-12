@@ -22,7 +22,7 @@ public class SQLiteConnection {
      * @return Connection object
      * @throws DatabaseConnectionException if connection fails
      */
-    public static Connection connect() throws DatabaseConnectionException, DatabaseQueryException {
+    public static synchronized Connection connect() throws DatabaseConnectionException, DatabaseQueryException {
         //sqlite connection string
         String url = "jdbc:sqlite:src/main/resources/database/w1985483.sqlite";
         if (!new File("src/main/resources/database/w1985483.sqlite").exists()) {
@@ -93,7 +93,6 @@ public class SQLiteConnection {
                             primary key (uuid, username)
                     );
                     """;
-
             try {
                 Connection conn = DriverManager.getConnection(url);
                 conn.createStatement().execute(userSql);
@@ -109,7 +108,8 @@ public class SQLiteConnection {
             }
         } else {
             try {
-                return DriverManager.getConnection(url);
+                Connection conn = DriverManager.getConnection(url);
+                return conn;
             } catch (SQLException e) {
                 throw new DatabaseConnectionException("Error connecting to database: " + e.getMessage());
             } catch (Exception e) {
