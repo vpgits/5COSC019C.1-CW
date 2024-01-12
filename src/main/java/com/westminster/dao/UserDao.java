@@ -2,6 +2,7 @@ package com.westminster.dao;
 
 
 import com.westminster.util.SQLiteConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,22 +20,23 @@ public class UserDao {
 
     /**
      * Adds a user to the database
+     *
      * @param username username
      * @param password password
      * @throws UserDaoException User DAO error
      */
-    public  void addUser(String username, String password, String fname,String lname, String email) throws UserDaoException{
-        if(getUserCount()>=50){
+    public void addUser(String username, String password, String fname, String lname, String email) throws UserDaoException {
+        if (getUserCount() >= 50) {
             throw new UserDaoException("User limit reached");
         }
         String sql = "INSERT INTO user(username, password, name, email) VALUES(?,?,?,?)";
         try (
-            Connection conn = SQLiteConnection.connect();
-            PreparedStatement pstmt = conn.prepareStatement(sql)
+                Connection conn = SQLiteConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
-            pstmt.setString(3, fname+" "+lname);
+            pstmt.setString(3, fname + " " + lname);
             pstmt.setString(4, email);
             pstmt.executeUpdate();
         } catch (Exception e) {
@@ -42,7 +44,13 @@ public class UserDao {
         }
     }
 
-    public void removeUser(String username) throws UserDaoException{
+    /**
+     * Removes a user from the database
+     *
+     * @param username username
+     * @throws UserDaoException User DAO error
+     */
+    public void removeUser(String username) throws UserDaoException {
         String sql = "DELETE FROM user WHERE username = ?";
         try (
                 Connection conn = SQLiteConnection.connect();
@@ -55,16 +63,21 @@ public class UserDao {
         }
     }
 
-
-    public  boolean doesExist(String username) {
+    /**
+     * Checks if a user exists
+     *
+     * @param username username
+     * @return true if the user exists, false otherwise
+     */
+    public boolean doesExist(String username) {
         String sql = "SELECT username FROM user WHERE username = ?";
-        try(
-            Connection conn = SQLiteConnection.connect();
-            PreparedStatement pstmt = conn.prepareStatement(sql)
-        ){
+        try (
+                Connection conn = SQLiteConnection.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)
+        ) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
-            if(rs.next()&&rs.getString("username").equals(username)){
+            if (rs.next() && rs.getString("username").equals(username)) {
                 return true;
             } else return false;
         } catch (Exception e) {
@@ -74,15 +87,16 @@ public class UserDao {
 
     /**
      * Gets the password hash of a user
+     *
      * @param username username
      * @return password has of the user
      */
-    public  String getUserPasswordHash(String username) {
+    public String getUserPasswordHash(String username) {
         String sql = "SELECT password  FROM user WHERE username = ?";
-        try(
+        try (
                 Connection conn = SQLiteConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
-                ) {
+        ) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -96,12 +110,17 @@ public class UserDao {
         }
     }
 
-    public  int getUserCount() {
+    /**
+     * Gets the user's name
+     *
+     * @return user's name
+     */
+    public int getUserCount() {
         String sql = "SELECT COUNT(*) FROM user";
-        try(
+        try (
                 Connection conn = SQLiteConnection.connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql)
-                ) {
+        ) {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
@@ -113,7 +132,9 @@ public class UserDao {
         }
     }
 
-
+    /**
+     * Custom Exception class for User DAO
+     */
     public static class UserDaoException extends RuntimeException {
         public UserDaoException(String message) {
             super(message);

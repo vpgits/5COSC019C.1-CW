@@ -1,34 +1,28 @@
 package com.westminster.view;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
 import com.westminster.dao.ProductDao;
 import com.westminster.dao.UserDao;
 import com.westminster.util.Validator;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 public class SignInUpView extends JFrame {
-    private UserDao userDao = new UserDao();
+    private static final ArrayList<String> activeUsers = new ArrayList<String>();
+    private final UserDao userDao = new UserDao();
 
     public SignInUpView() {
         initComponents();
     }
 
-    private void initComponents()  {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(SignInUpView::new);
+    }
+
+    private void initComponents() {
         JTabbedPane tabbedPane = new JTabbedPane();
         JPanel signInPanel = new JPanel(new GridBagLayout());
         JPanel signUpPanel = new JPanel(new GridBagLayout());
@@ -71,10 +65,27 @@ public class SignInUpView extends JFrame {
             public void actionPerformed(ActionEvent event) {
                 String username = signInUsernameField.getText();
                 String password = String.valueOf(signInPasswordField.getPassword());
-                if (username.isBlank() && password.isBlank()){
+                if (username.isBlank() && password.isBlank()) {
                     signInMessageLabel.setText("Please fill in all fields.");
+                    return;
                 }
-                if (!username.isBlank() && !password.isBlank() && Validator.doesUserExist(username) && Validator.checkPasswordHash(username, password)) {
+                if (username.isBlank()) {
+                    signInMessageLabel.setText("Please enter a username.");
+                    return;
+                }
+                if (password.isBlank()) {
+                    signInMessageLabel.setText("Please enter a password.");
+                    return;
+                }
+                if (!Validator.doesUserExist(username)) {
+                    signInMessageLabel.setText("User does not exist.");
+                    return;
+                }
+                if (activeUsers.contains(username)) {
+                    signInMessageLabel.setText("User already logged in.");
+                    return;
+                }
+                if (Validator.checkPasswordHash(username, password)) {
                     signInMessageLabel.setText("User logged in successfully.");
                     try {
                         Thread.sleep(1000);
@@ -82,20 +93,21 @@ public class SignInUpView extends JFrame {
                         throw new RuntimeException(e);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        Window currentWindow =  SwingUtilities.getWindowAncestor((Component) event.getSource());
-                        if (currentWindow != null) {
-                            currentWindow.dispose();
+                        public void run() {
+                            Window currentWindow = SwingUtilities.getWindowAncestor((Component) event.getSource());
+                            if (currentWindow != null) {
+                                currentWindow.dispose();
+                            }
+                            try {
+                                activeUsers.add(username);
+                                new WestminsterShoppingCenterGuiView(username);
+                            } catch (ProductDao.ProductDaoException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
-                        try {
-                            new WestminsterShoppingCenterGuiView(username);
-                        } catch (ProductDao.ProductDaoException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
+                    });
                 } else {
-                    System.out.println("User does not exist");
+                    signInMessageLabel.setText("Incorrect password.");
                 }
             }
         });
@@ -123,41 +135,43 @@ public class SignInUpView extends JFrame {
         signUpConstraints.gridy = 1;
         signUpPanel.add(signUpPasswordField, signUpConstraints);
 
-        JLabel signUpFirstNameLabel = new JLabel("First Name");
-        JTextField signUpFirstNameField = new JTextField(16);
+        JLabel signUpConfirmPasswordLabel = new JLabel("Confirm Password");
+        JPasswordField signUpConfirmPasswordField = new JPasswordField(16);
         signUpConstraints.gridx = 0;
         signUpConstraints.gridy = 2;
-        signUpPanel.add(signUpFirstNameLabel, signUpConstraints);
+        signUpPanel.add(signUpConfirmPasswordLabel, signUpConstraints);
         signUpConstraints.gridx = 1;
         signUpConstraints.gridy = 2;
-        signUpPanel.add(signUpFirstNameField, signUpConstraints);
+        signUpPanel.add(signUpConfirmPasswordField, signUpConstraints);
+
 
         JLabel signUpLastNameLabel = new JLabel("Last Name");
         JTextField signUpLastNameField = new JTextField(16);
         signUpConstraints.gridx = 0;
-        signUpConstraints.gridy = 3;
+        signUpConstraints.gridy = 4;
         signUpPanel.add(signUpLastNameLabel, signUpConstraints);
         signUpConstraints.gridx = 1;
-        signUpConstraints.gridy = 3;
+        signUpConstraints.gridy = 4;
         signUpPanel.add(signUpLastNameField, signUpConstraints);
 
         JLabel signUpEmailLabel = new JLabel("Email");
         JTextField signUpEmailField = new JTextField(16);
         signUpConstraints.gridx = 0;
-        signUpConstraints.gridy = 4;
+        signUpConstraints.gridy = 5;
         signUpPanel.add(signUpEmailLabel, signUpConstraints);
         signUpConstraints.gridx = 1;
-        signUpConstraints.gridy = 4;
+        signUpConstraints.gridy = 5;
         signUpPanel.add(signUpEmailField, signUpConstraints);
 
-        JLabel signUpConfirmPasswordLabel = new JLabel("Confirm Password");
-        JPasswordField signUpConfirmPasswordField = new JPasswordField(16);
+        JLabel signUpFirstNameLabel = new JLabel("First Name");
+        JTextField signUpFirstNameField = new JTextField(16);
         signUpConstraints.gridx = 0;
-        signUpConstraints.gridy = 5;
-        signUpPanel.add(signUpConfirmPasswordLabel, signUpConstraints);
+        signUpConstraints.gridy = 3;
+        signUpPanel.add(signUpFirstNameLabel, signUpConstraints);
         signUpConstraints.gridx = 1;
-        signUpConstraints.gridy = 5;
-        signUpPanel.add(signUpConfirmPasswordField, signUpConstraints);
+        signUpConstraints.gridy = 3;
+        signUpPanel.add(signUpFirstNameField, signUpConstraints);
+
 
         JButton signUpButton = new JButton("Sign Up");
         signUpConstraints.gridx = 1;
@@ -170,14 +184,14 @@ public class SignInUpView extends JFrame {
         signUpPanel.add(signUpMessageLable, signUpConstraints);
 
         // Sign Up Button ActionListener
-        signUpButton.addActionListener(new ActionListener()  {
+        signUpButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent event){
+            public void actionPerformed(ActionEvent event) {
                 String username = signUpUsernameField.getText();
                 String password = String.valueOf(signUpPasswordField.getPassword());
                 String firstName = signUpFirstNameField.getText();
                 String lastName = signUpLastNameField.getText();
-                String email  =  signUpEmailField.getText();
+                String email = signUpEmailField.getText();
                 if (username.isBlank() || password.isBlank() || firstName.isBlank() || lastName.isBlank() || email.isBlank()) {
                     signUpMessageLable.setText("Please fill in all fields.");
                     return;
@@ -185,22 +199,22 @@ public class SignInUpView extends JFrame {
                 if (Validator.doesUserExist(username)) {
                     signUpMessageLable.setText("Username already exists.");
                     return;
-                } else if (!Validator.regexMatcher(email, "^[A-Za-z0-9+_.-]+@(.+)$")){
+                } else if (!Validator.regexMatcher(email, "^[A-Za-z0-9+_.-]+@(.+)$")) {
                     signUpMessageLable.setText("Please enter a valid email");
                     return;
                 }
-                if (!Validator.regexMatcher(password, "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,16}$")){
+                if (!Validator.regexMatcher(password, "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,16}$")) {
                     signUpMessageLable.setText("Please enter a valid password");
                     return;
                 }
                 try {
                     password = Validator.hashPassword(password);
-                    userDao.addUser(username, password,firstName ,lastName, email);
+                    userDao.addUser(username, password, firstName, lastName, email);
                     signUpMessageLable.setText("User Added");
                 } catch (UserDao.UserDaoException e) {
                     signUpMessageLable.setText("Something went wrong.");
                 }
-                
+
             }
         });
 
@@ -211,11 +225,7 @@ public class SignInUpView extends JFrame {
         setSize(450, 300);
         setTitle("Welcome");
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(SignInUpView::new);
     }
 }

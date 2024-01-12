@@ -1,12 +1,19 @@
 package com.westminster.interfaces;
 
 
+import com.westminster.controller.ProductController;
+
+/**
+ * This interface contains methods for managing products.
+ */
 public interface ShoppingManager {
+    //abstract methods
+    void addProduct(ProductController productController);
 
-    static void addProduct() throws Exception {}
+    void deleteProduct(ProductController productController);
 
-    static void removeProduct () throws Exception{}
+    void printAllProducts(ProductController productController);
 
-    static void updateProduct() throws Exception {}
+    void saveProducts(ProductController productController);
 
 }

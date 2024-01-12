@@ -1,11 +1,11 @@
 package com.westminster.model;
 
 public class Electronics extends Product {
-    //instance variables
-    private String brand; //brand of the electronic product
-    private String model; //model of the electronic product
-    private String type; //type of the electronic product
-    private int warranty; //warranty of the electronic product in months
+    // instance variables
+    private String brand; // brand of the electronic product
+    private String model; // model of the electronic product
+    private String type; // type of the electronic product
+    private int warranty; // warranty of the electronic product in months
 
     @Override
     public String toString() {
@@ -13,10 +13,12 @@ public class Electronics extends Product {
                 " brand : " + brand + '\n' +
                 " model : " + model + '\n' +
                 " type : " + type + '\n' +
-                " warranty : " + warranty
-                ;
+                " warranty : " + warranty;
     }
 
+    public String toStringTable() {
+        return brand + ' ' + model + ' ' + type + ' ' + warranty + " months warranty";
+    }
 
     public String toStringConsole() {
         return
@@ -24,25 +26,35 @@ public class Electronics extends Product {
                 "- brand : " + brand + '\n' +
                 "- model : " + model + '\n' +
                 "- type : " + type + '\n' +
-                "- warranty : " + warranty+'\n'
-                ;
+                "- warranty : " + warranty + '\n';
     }
 
-    //default constructor
+    // default constructor
     public Electronics() {
         super();
     }
 
-    public Electronics (String productID, String productName, int availableItems, double price, String brand,
-                        String model, String type, int warranty){
-        super(productID, productName, availableItems, price , ProductType.Electronics);
+    /**
+     * Constructs an Electronics object with the specified parameters.
+     * @param productID
+     * @param productName
+     * @param availableItems
+     * @param price
+     * @param brand
+     * @param model
+     * @param type
+     * @param warranty
+     */
+    public Electronics(String productID, String productName, int availableItems, double price, String brand,
+                       String model, String type, int warranty) {
+        super(productID, productName, availableItems, price, ProductType.Electronics);
         this.brand = brand;
         this.model = model;
         this.type = type;
         this.warranty = warranty;
     }
 
-    //getters and setters
+    // getters and setters
     public String getBrand() {
         return brand;
     }
@@ -70,7 +82,8 @@ public class Electronics extends Product {
     public int getWarranty() {
         return warranty;
     }
-    //toString method
+
+    // toString method
     public void setWarranty(int warranty) {
         this.warranty = warranty;
     }

@@ -3,19 +3,20 @@ package com.westminster.model;
 import java.io.Serializable;
 
 public abstract class Product implements Serializable {
-    //instance variables
-    private String productID; //ID of the product
-    public static final int PRODUCTIDLENGTH = 8; //length of the product ID
-    private String productName; //name of the product
-    private int availableItems; //number of available items
-    private double price; //price of the product
-    ProductType type; //type of the product
+    // instance variables
+    private String productID; // ID of the product
+    public static final int PRODUCTIDLENGTH = 7; // length of the product ID
+    private String productName; // name of the product
+    private int availableItems; // number of available items
+    private double price; // price of the product
+    ProductType type; // type of the product
 
     // default constructor
     public Product() {
         super();
     }
 
+    // parameterized constructor
     public Product(String productID, String productName, int availableItems, double price, ProductType type) {
         this.productID = productID;
         this.productName = productName;
@@ -24,10 +25,11 @@ public abstract class Product implements Serializable {
         this.type = type;
     }
 
-    //getter and setter methods
+    // getter and setter methods
     public String getProductID() {
         return productID;
     }
+
 
     public void setProductID(String productID) {
         this.productID = productID;
@@ -65,15 +67,18 @@ public abstract class Product implements Serializable {
         this.type = type;
     }
 
-    //toString method
+    // toString method
     @Override
     public String toString() {
         return
                 "Product ID : " + productID + '\n' +
                 "- Product Name : " + productName + '\n' +
                 "- Available Items : " + availableItems + '\n' +
-                "- Price : " + price +"£\n";
+                "- Price : " + price + "£\n";
     }
+
+    // abstract methods
+    public abstract String toStringTable();
 
     public abstract String toStringConsole();
 }
