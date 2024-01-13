@@ -116,6 +116,7 @@ public class SignInUpView extends JFrame {
 
         JLabel signUpUsernameLabel = new JLabel("Username");
         JTextField signUpUsernameField = new JTextField(16);
+        signUpUsernameField.setToolTipText("Choose a unique username.");
         signUpConstraints.gridx = 0;
         signUpConstraints.gridy = 0;
         signUpPanel.add(signUpUsernameLabel, signUpConstraints);
@@ -125,6 +126,7 @@ public class SignInUpView extends JFrame {
 
         JLabel signUpPasswordLabel = new JLabel("Password");
         JPasswordField signUpPasswordField = new JPasswordField(16);
+        signUpPasswordField.setToolTipText("Password must be 8-16 characters with a mix of letters, numbers, and symbols.");
         signUpConstraints.gridx = 0;
         signUpConstraints.gridy = 1;
         signUpPanel.add(signUpPasswordLabel, signUpConstraints);
@@ -134,6 +136,8 @@ public class SignInUpView extends JFrame {
 
         JLabel signUpConfirmPasswordLabel = new JLabel("Confirm Password");
         JPasswordField signUpConfirmPasswordField = new JPasswordField(16);
+        signUpConfirmPasswordField.setToolTipText("Re-enter your password for confirmation.");
+
         signUpConstraints.gridx = 0;
         signUpConstraints.gridy = 2;
         signUpPanel.add(signUpConfirmPasswordLabel, signUpConstraints);
@@ -144,6 +148,7 @@ public class SignInUpView extends JFrame {
 
         JLabel signUpLastNameLabel = new JLabel("Last Name");
         JTextField signUpLastNameField = new JTextField(16);
+        signUpLastNameField.setToolTipText("Enter your last name.");
         signUpConstraints.gridx = 0;
         signUpConstraints.gridy = 4;
         signUpPanel.add(signUpLastNameLabel, signUpConstraints);
@@ -153,6 +158,7 @@ public class SignInUpView extends JFrame {
 
         JLabel signUpEmailLabel = new JLabel("Email");
         JTextField signUpEmailField = new JTextField(16);
+        signUpEmailField.setToolTipText("Enter a valid email address.");
         signUpConstraints.gridx = 0;
         signUpConstraints.gridy = 5;
         signUpPanel.add(signUpEmailLabel, signUpConstraints);
@@ -162,6 +168,7 @@ public class SignInUpView extends JFrame {
 
         JLabel signUpFirstNameLabel = new JLabel("First Name");
         JTextField signUpFirstNameField = new JTextField(16);
+        signUpFirstNameField.setToolTipText("Enter your first name.");
         signUpConstraints.gridx = 0;
         signUpConstraints.gridy = 3;
         signUpPanel.add(signUpFirstNameLabel, signUpConstraints);
@@ -186,6 +193,7 @@ public class SignInUpView extends JFrame {
             public void actionPerformed(ActionEvent event) {
                 String username = signUpUsernameField.getText();
                 String password = String.valueOf(signUpPasswordField.getPassword());
+                String confirmPassword = String.valueOf(signUpConfirmPasswordField.getPassword());
                 String firstName = signUpFirstNameField.getText();
                 String lastName = signUpLastNameField.getText();
                 String email = signUpEmailField.getText();
@@ -202,6 +210,10 @@ public class SignInUpView extends JFrame {
                 }
                 if (!Validator.regexMatcher(password, "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,16}$")) {
                     signUpMessageLable.setText("Please enter a valid password");
+                    return;
+                }
+                if (!password.equals(confirmPassword)) {
+                    signUpMessageLable.setText("Passwords do not match.");
                     return;
                 }
                 try {

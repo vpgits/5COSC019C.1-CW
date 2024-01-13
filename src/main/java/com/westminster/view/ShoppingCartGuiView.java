@@ -143,7 +143,7 @@ public class ShoppingCartGuiView extends JFrame {
             spinner.addChangeListener(new ChangeListener() {
                 @Override
                 public synchronized void  stateChanged(ChangeEvent e) {
-                    lastValue = shoppingCartDao.getCurrentProductStock("test", table.getValueAt(table.getSelectedRow(), 0).toString());
+                    lastValue = shoppingCartDao.getCurrentProductStock(username, table.getValueAt(table.getSelectedRow(), 0).toString());
                     int value = Integer.parseInt(spinner.getValue().toString());
                     if (value == lastValue || table.getSelectedRow() == -1) {
                         return;
@@ -153,7 +153,7 @@ public class ShoppingCartGuiView extends JFrame {
                         return; // No selection or invalid row
                     }
                     if (Integer.parseInt(spinner.getValue().toString()) == 0) {
-                        shoppingCartDao.removeProductFromShoppingCart("test", table.getValueAt(table.getSelectedRow(), 0).toString(), lastValue);
+                        shoppingCartDao.removeProductFromShoppingCart(username, table.getValueAt(table.getSelectedRow(), 0).toString(), lastValue);
                         Product product = (Product) productDao.getProduct((String) table.getValueAt(table.getSelectedRow(), 0));
                         if (table.getColumnCount() > 2) {
                             table.setValueAt(String.format("%.2f", (int) spinner.getValue() * product.getPrice()), table.getSelectedRow(), 2);
@@ -172,7 +172,7 @@ public class ShoppingCartGuiView extends JFrame {
                             if (table.getColumnCount() > 2) {
                                 table.setValueAt(String.format("%.2f", (int) spinner.getValue() * product.getPrice()), table.getSelectedRow(), 2);
                             }
-                            shoppingCartDao.updateProduct("test", table.getValueAt(table.getSelectedRow(), 0).toString(), deviation);
+                            shoppingCartDao.updateProduct(username, table.getValueAt(table.getSelectedRow(), 0).toString(), deviation);
                             panel.updateFooterPanel(username);
                         }
                     }

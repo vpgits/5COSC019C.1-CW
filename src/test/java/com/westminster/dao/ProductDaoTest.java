@@ -60,14 +60,47 @@ class ProductDaoTest {
     void addProduct() {
         Product product1 = new Clothing("Test002", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
         productDao.addProduct(product1);
-//        try {
-//            Thread.sleep(10000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         assertTrue(productDao.doesProductExist(product1.getProductID()));
         productDao.deleteProduct(product1.getProductID());
 
+    }
+    @Test
+    void addFiveProducts(){
+        Product product1 = new Clothing("Test002", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product2 = new Clothing("Test003", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product3 = new Clothing("Test004", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product4 = new Clothing("Test005", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product5 = new Clothing("Test006", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        productDao.addProduct(product1);
+        productDao.addProduct(product2);
+        productDao.addProduct(product3);
+        productDao.addProduct(product4);
+        productDao.addProduct(product5);
+        assertTrue(productDao.doesProductExist(product1.getProductID()));
+        assertTrue(productDao.doesProductExist(product2.getProductID()));
+        assertTrue(productDao.doesProductExist(product3.getProductID()));
+        assertTrue(productDao.doesProductExist(product4.getProductID()));
+        assertTrue(productDao.doesProductExist(product5.getProductID()));
+
+    }
+
+    @Test
+    void deleteFiveProducts(){
+        Product product1 = new Clothing("Test002", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product2 = new Clothing("Test003", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product3 = new Clothing("Test004", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product4 = new Clothing("Test005", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        Product product5 = new Clothing("Test006", "T-Shirt", 10, 10.0, "Nike", ClothingSize.S, "Red");
+        productDao.deleteProduct(product1.getProductID());
+        productDao.deleteProduct(product2.getProductID());
+        productDao.deleteProduct(product3.getProductID());
+        productDao.deleteProduct(product4.getProductID());
+        productDao.deleteProduct(product5.getProductID());
+        assertFalse(productDao.doesProductExist(product1.getProductID()));
+        assertFalse(productDao.doesProductExist(product2.getProductID()));
+        assertFalse(productDao.doesProductExist(product3.getProductID()));
+        assertFalse(productDao.doesProductExist(product4.getProductID()));
+        assertFalse(productDao.doesProductExist(product5.getProductID()));
     }
 
     /**

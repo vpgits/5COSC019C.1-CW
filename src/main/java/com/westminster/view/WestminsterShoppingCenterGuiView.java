@@ -314,8 +314,8 @@ public class WestminsterShoppingCenterGuiView extends JFrame {
             try {
                 switch (selectedCategory) {
                     case "All" -> {
-                        products.addAll(productDao.getProducts(ProductType.Electronics));
                         products.addAll(productDao.getProducts(ProductType.Clothing));
+                        products.addAll(productDao.getProducts(ProductType.Electronics));
                     }
                     case "Clothing" -> products.addAll(productDao.getProducts(ProductType.Clothing));
                     case "Electronics" -> products.addAll(productDao.getProducts(ProductType.Electronics));
